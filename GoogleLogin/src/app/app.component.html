@@ -1,0 +1,12 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="container" >
+  <button *ngIf="!isLoggedIn" class="btn btn-primary" (click)="login()" type="submit">Login</button>
+  <div *ngIf="isLoggedIn" class="content">
+    <span>Welcome !!</span>
+    <a class="btn btn-default pull-right" (click)="logout()" href="#">Logout</a>
+    <br/>
+  </div>
+  <button (click)="res()">Res</button>
+  <button (click)="res2()">Res2</button>
+</div>
+<router-outlet></router-outlet>
