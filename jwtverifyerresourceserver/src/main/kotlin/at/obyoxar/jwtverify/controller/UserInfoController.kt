@@ -13,6 +13,20 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class UserInfoController {
 
+    @GetMapping("/free")
+    @PreAuthorize("isAuthenticated()")
+    fun getInfoFree(): Map<String, Any>{
+        val principal = SecurityContextHolder.getContext().authentication.principal as Jwt
+        return principal.claims
+    }
+
+    @GetMapping("/basic")
+    @PreAuthorize("hasAnyRole('USER')")
+    fun getInfoUser(): Map<String, Any>{
+        val principal = SecurityContextHolder.getContext().authentication.principal as Jwt
+        return principal.claims
+    }
+
     @GetMapping("/user")
     @PreAuthorize("hasRole('ADMIN')")
     fun getInfo(): Map<String, Any>{

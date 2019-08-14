@@ -41,6 +41,16 @@ export class AppComponent implements OnInit {
     });
   }
 
+  request(path: string) {
+    console.log(this.oauthService.getIdentityClaims());
+    this.appService.getResource(`http://localhost:8081/${path}`).subscribe((str) => {
+      console.log(`User ${path}:`);
+      console.log(str);
+    });
+  }
+
+
+
   logout() {
     this.appService.logout();
   }

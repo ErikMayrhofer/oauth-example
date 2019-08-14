@@ -6,7 +6,9 @@
     <a class="btn btn-default pull-right" (click)="logout()" href="#">Logout</a>
     <br/>
   </div>
-  <button (click)="res()">Res</button>
-  <button (click)="res2()">Res2</button>
+  <button (click)="request('user')">User</button>
+  <button (click)="request('user2')">User2</button>
+  <button (click)="request('free')">Free</button>
+  <button (click)="request('basic')">Basic</button>
 </div>
 <router-outlet></router-outlet>
