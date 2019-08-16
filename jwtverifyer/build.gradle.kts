@@ -19,7 +19,7 @@ repositories {
 dependencies {
 //    implementation("org.springframework.boot:spring-boot-starter-data-rest")
 
-//    implementation("com.google.api-client:google-api-client:1.30.2")
+    implementation("com.google.api-client:google-api-client:1.30.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

@@ -45,7 +45,6 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
         return super.authenticationManagerBean()
     }
 
-//      TODO NEEDED FOR GOOGLE
 //    override fun configure(web: WebSecurity?) {
 //        web!!.ignoring()
 //                .antMatchers("/verify")
@@ -55,6 +54,7 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
         http!!
                 .authorizeRequests()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/verify").permitAll()
                 .antMatchers("/oauth/token/revokeById/**").permitAll()
                 .antMatchers("/**/favicon.ico").permitAll()
                 .antMatchers("/tokens/**").permitAll()
@@ -83,11 +83,6 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
         val source = JWKSource<SecurityContext> { jwkSelector, _ -> mutableListOf(rsakey as JWK) }
         return OJwtDecoderBase(source, "RS256")
     }
-
-//    @Bean
-//    fun authenticationFilter(): Filter {
-//
-//    }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
         auth!!

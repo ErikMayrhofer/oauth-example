@@ -1,4 +1,4 @@
-/*
+
 package at.obyoxar.jwtverify.controller
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
@@ -127,4 +127,3 @@ class VerifyerController {
         throw UserDeniedAuthorizationException("Invalid ID token.")
     }
 }
-*/

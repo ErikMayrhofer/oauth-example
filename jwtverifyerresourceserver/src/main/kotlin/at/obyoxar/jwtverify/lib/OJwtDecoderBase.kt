@@ -31,7 +31,7 @@ import java.text.ParseException
 import java.time.Instant
 import java.util.LinkedHashMap
 
-private val DECODING_ERROR_MESSAGE_TEMPLATE = "An error occurred while attempting to decode the Jwt: %s"
+private const val DECODING_ERROR_MESSAGE_TEMPLATE = "An error occurred while attempting to decode the Jwt: %s"
 
 class OJwtDecoderBase constructor(jwkSource: JWKSource<SecurityContext>, jwsAlgorithm: String) : JwtDecoder {
 

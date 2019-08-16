@@ -39,20 +39,11 @@ import javax.crypto.SecretKey
 @Order(2)
 class WebSecurityConfig: WebSecurityConfigurerAdapter() {
 
-    @Autowired
-    lateinit var passwordEncoder: BCryptPasswordEncoder
-
     @Override
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager {
         return super.authenticationManagerBean()
     }
-
-//      TODO NEEDED FOR GOOGLE
-//    override fun configure(web: WebSecurity?) {
-//        web!!.ignoring()
-//                .antMatchers("/verify")
-//    }
 
     override fun configure(http: HttpSecurity?) {
         http!!.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -60,34 +51,21 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
                     .jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(converter())
                     .and()
                 .and()
-            .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/user2").hasAnyRole("ADMIN")
                 .antMatchers("/**").permitAll()
-//        http
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-//                .authorizeRequests()
-//                .anyRequest().authenticated()
-//                .and().csrf().disable()
     }
 
     @Bean
     fun jwtDecoder(): JwtDecoder {
-        val res = javaClass.getResource("/keys/obykeys.jks")
         val keyStore = KeyStore.getInstance("JKS")
-        keyStore.load(res.openStream(), "obypass".toCharArray())
-        val pwLookup = PasswordLookup { "obypass".toCharArray() }
-        val jwkLoadedSet = JWKSet.load(keyStore, null)
-        val jwkSet = ImmutableJWKSet<SecurityContext>(jwkLoadedSet)
+        keyStore.load(ClassPathResource("keys/obykeys.jks").inputStream, "obypass".toCharArray())
 
         val rsakey = RSAKey.load(keyStore, "obykey", "obypass".toCharArray())
 
-
-        val keyStoreFactory = KeyStoreKeyFactory(ClassPathResource("keys/obykeys.jks"), "obypass".toCharArray())
-        val keyPair = keyStoreFactory.getKeyPair("obykey")
-
-        val selector = JWSKeySelector<SecurityContext> { header, context -> mutableListOf(keyPair.public as Key) }
-        val source = JWKSource<SecurityContext> { jwkSelector, _ -> mutableListOf(rsakey as JWK) }
+        val source = JWKSource<SecurityContext> { _, _ ->
+            mutableListOf(rsakey as JWK)
+        }
         return OJwtDecoderBase(source, "RS256")
     }
 

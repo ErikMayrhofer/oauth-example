@@ -1,31 +1,12 @@
 package at.obyoxar.jwtverify.configuration
 
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.http.HttpServletRequest
-import org.springframework.http.HttpMethod
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import javax.servlet.*
-
-
-/*
-@Configuration
-class CorsConfiguration {
-    @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**").allowedOrigins("*").allowedMethods("*").allowedHeaders("*")
-            }
-        }
-    }
-}*/*/
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
