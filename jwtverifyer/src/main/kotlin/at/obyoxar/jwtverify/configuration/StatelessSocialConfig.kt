@@ -30,6 +30,12 @@ class StatelessSocialConfig: SocialConfigurerAdapter() {
     @Value("\${google.clientSecret}")
     lateinit var clientSecret: String
 
+    @Value("\${github.clientId}")
+    lateinit var githubClientId: String
+
+    @Value("\${github.clientSecret}")
+    lateinit var githubClientSecret: String
+
     @Autowired
     lateinit var autoSignUpHandler: AutoSignUpHandler
 
@@ -43,7 +49,7 @@ class StatelessSocialConfig: SocialConfigurerAdapter() {
             }
         )
         connectionFactoryConfigurer.addConnectionFactory(
-                GitHubConnectionFactory("571f3887642dc9de2883", "3abb3c5015a5b06f16fa88854e8f24b4aecfa596")
+                GitHubConnectionFactory(githubClientId, githubClientSecret)
         )
     }
 
