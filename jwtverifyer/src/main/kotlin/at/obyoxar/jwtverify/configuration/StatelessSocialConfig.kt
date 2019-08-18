@@ -33,6 +33,9 @@ class StatelessSocialConfig: SocialConfigurerAdapter() {
     @Autowired
     lateinit var autoSignUpHandler: AutoSignUpHandler
 
+    @Autowired
+    lateinit var userService: UserService
+
     override fun addConnectionFactories(connectionFactoryConfigurer: ConnectionFactoryConfigurer?, environment: Environment?) {
         connectionFactoryConfigurer!!.addConnectionFactory(
             GoogleConnectionFactory(clientId, clientSecret).apply {
@@ -48,9 +51,11 @@ class StatelessSocialConfig: SocialConfigurerAdapter() {
         return UserAuthenticationUserIdSource()
     }
 
-    override fun getUsersConnectionRepository(connectionFactoryLocator: ConnectionFactoryLocator?): UsersConnectionRepository {
-        val usersConnectionRepository = InMemoryUsersConnectionRepository(connectionFactoryLocator)
-        usersConnectionRepository.setConnectionSignUp(autoSignUpHandler)
+    override fun getUsersConnectionRepository(connectionFactoryLocator: ConnectionFactoryLocator): UsersConnectionRepository {
+//        val usersConnectionRepository = InMemoryUsersConnectionRepository(connectionFactoryLocator)
+//        usersConnectionRepository.setConnectionSignUp(autoSignUpHandler)
+//        usersConnectionRepository.
+        val usersConnectionRepository = SimpleUsersConnectionRepository(userService, connectionFactoryLocator, autoSignUpHandler)
         return usersConnectionRepository
     }
 

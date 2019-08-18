@@ -50,7 +50,7 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
     lateinit var userIdSource: UserIdSource
 
     @Autowired
-    lateinit var userService: SocialUserService
+    lateinit var userService: UserService
 
     override fun configure(http: HttpSecurity?) {
         val socialConfigurer = SpringSocialConfigurer()
@@ -84,7 +84,7 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
 //                .formLogin().permitAll()
 //                .and()
                 .addFilter(JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(JwtAuthorizationFilter(authenticationManager()))
+                .addFilter(JwtAuthorizationFilter(authenticationManager(), userService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(statelessAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter::class.java)

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse
 class JwtAuthenticationFilter(authenticationManager: AuthenticationManager): UsernamePasswordAuthenticationFilter() {
 
     init {
-        setFilterProcessesUrl("/api/authenticate")
+        setFilterProcessesUrl("/auth/local")
 
         this.authenticationManager = authenticationManager
     }
@@ -40,7 +40,7 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager): Use
                 .setHeaderParam("typ", "JWT")
                 .setIssuer("mySampleIssuer")
                 .setAudience("mySampleAudience")
-                .setSubject(user.username)
+                .setSubject(user.userId)
                 .setExpiration(Date.from(Instant.now().plus(10, ChronoUnit.DAYS)))
                 .claim("rol", roles)
                 .compact()

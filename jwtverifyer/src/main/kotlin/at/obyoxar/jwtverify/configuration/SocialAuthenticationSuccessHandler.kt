@@ -19,17 +19,10 @@ class SocialAuthenticationSuccessHandler: SavedRequestAwareAuthenticationSuccess
     @Autowired
     lateinit var userService: SocialUserService
 
-    @Autowired
-    lateinit var tokenAuthenticationService: TokenAuthenticationService
-
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         println("AuthenticationSuccess: ${authentication!!.name}")
         val authenticatedUser = userService.loadUserByUsername(authentication.name);
-        println(" User: ${authenticatedUser}")
-
-        // Add UserAuthentication to the response
-//        val userAuthentication = UserAuthentication(authenticatedUser);
-//        tokenAuthenticationService.addAuthentication(response!!, userAuthentication);
+        println(" User: $authenticatedUser")
 
         val user = authentication.principal as User
         val roles = user.authorities.map { it.authority }
@@ -39,7 +32,7 @@ class SocialAuthenticationSuccessHandler: SavedRequestAwareAuthenticationSuccess
                 .setHeaderParam("typ", "JWT")
                 .setIssuer("mySampleIssuer")
                 .setAudience("mySampleAudience")
-                .setSubject(user.username)
+                .setSubject(user.userId)
                 .setExpiration(Date.from(Instant.now().plus(10, ChronoUnit.DAYS)))
                 .claim("rol", roles)
                 .claim("from", "sociallogin")

@@ -19,6 +19,8 @@ class User(password: String? = null, userId: Long? = null, username: String? = n
     var expires: Long = 0
     val authorities = mutableListOf<UserAuthority>()
 
+    var thingy = 0
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority("USER"))
     }

@@ -4,7 +4,7 @@ import org.springframework.social.connect.Connection
 import org.springframework.social.connect.ConnectionSignUp
 import org.springframework.stereotype.Component
 import org.springframework.beans.factory.annotation.Autowired
-
+import org.springframework.security.core.context.SecurityContextHolder
 
 
 @Component
@@ -18,6 +18,8 @@ class AutoSignUpHandler: ConnectionSignUp {
 
     override fun execute(connection: Connection<*>): String {
         //add new users to the db with its default roles for later use in SocialAuthenticationSuccessHandler
+        val auth = SecurityContextHolder.getContext().authentication
+
         val user = User()
         user.setUsername(generateUniqueUserName(connection.fetchUserProfile().firstName))
         user.providerId = connection.key.providerId

@@ -46,4 +46,12 @@ class UserInfoController {
     fun getAllUsers(): MutableList<User> {
         return repo.users
     }
+
+    @GetMapping("/api/thingy")
+    fun increaseThingyy(): User {
+        val user = SecurityContextHolder.getContext().authentication.details as User
+        user.thingy+=1
+        return user
+    }
+
 }

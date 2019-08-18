@@ -1,17 +1,21 @@
 package at.obyoxar.jwtverify.configuration
 
 import io.jsonwebtoken.*
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 
 
-class JwtAuthorizationFilter(authenticationManager: AuthenticationManager): BasicAuthenticationFilter(authenticationManager) {
+class JwtAuthorizationFilter(authenticationManager: AuthenticationManager, var userService: UserService): BasicAuthenticationFilter(authenticationManager) {
+
+
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val authentication = getAuthentication(request)
         if(authentication == null){
@@ -22,11 +26,15 @@ class JwtAuthorizationFilter(authenticationManager: AuthenticationManager): Basi
         chain.doFilter(request, response)
     }
 
-    private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        val tokenA = request.getHeader("Authorization ")
-        val tokenB = request.cookies.first { it.name == "AUTH-TOKEN" }.value
-        val token = tokenA ?: "Bearer $tokenB"
-        if (token.isNotEmpty() && token.startsWith("Bearer ")) {
+    private fun getAuthentication(request: HttpServletRequest): Authentication? {
+//        val tokenA = request.getHeader("Authorization ")
+        val token = request.cookies.firstOrNull { it.name == "AUTH-TOKEN" }?.value
+        if(token == null){
+            println("JwtAuthorization: Request didn't have a token")
+            return null
+        }
+
+        if (token.isNotEmpty()) {
             try {
                 val signingKey = "yeeeet".toByteArray()
 
@@ -34,14 +42,14 @@ class JwtAuthorizationFilter(authenticationManager: AuthenticationManager): Basi
                         .setSigningKey(signingKey)
                         .parseClaimsJws(token.replace("Bearer ", ""))
 
-                val username = parsedToken.body.subject
+                val userId = parsedToken.body.subject
 
                 val authorities = (parsedToken.body["rol"] as List<*>).map {
                     authority -> SimpleGrantedAuthority(authority as String)
                 }
 
-                if (username.isNotEmpty()) {
-                    return UsernamePasswordAuthenticationToken(username, null, authorities)
+                if (userId.isNotEmpty()) {
+                    return UserAuthentication(userService.loadUserByUserId(userId))
                 }
             } catch (exception: ExpiredJwtException) {
                 println("Request to parse expired JWT : ${token} failed : ${exception.message}")
@@ -57,6 +65,7 @@ class JwtAuthorizationFilter(authenticationManager: AuthenticationManager): Basi
 
         }
 
+        println("JwtAuthorization: Request didn't have a valid token: ${token}")
         return null
     }
 }

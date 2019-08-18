@@ -3,6 +3,7 @@ package at.obyoxar.jwtverify.configuration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.social.connect.Connection
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
@@ -17,10 +18,9 @@ class UserRepository {
     @PostConstruct
     fun postConstruct(){
         users = mutableListOf(
-                User(passwordEncoder.encode("abc1"), 1, "abc", "google"),
-                User(passwordEncoder.encode("123"), 2, "john", "google"),
-                User(passwordEncoder.encode("abc3"), 3, "def", "yeet"),
-                User(passwordEncoder.encode("admin"), 4, "admin", "yeet")
+                User(passwordEncoder.encode("123"), 2, "john", "local"),
+                User(passwordEncoder.encode("admin"), 4, "admin", "local"),
+                User(passwordEncoder.encode("erik"), 5, "erik", "google", "114861104432965613969")
         ).onEach {
             val role = if(it.username == "admin") UserRole.ADMIN else UserRole.USER
             it.grantRole(role)
@@ -37,9 +37,9 @@ class UserRepository {
         return users.firstOrNull { it.getUserIdLong() == id }
     }
 
-    fun findByProviderIdAndProviderUserId(providerId: String, providerUserId: String): User?{
+    fun findByProviderIdAndProviderUserId(providerId: String, providerUserId: String): List<User> {
         println("REPOSITORY: findByProviderIdAndProviderUserId: ${providerId}, ${providerUserId}")
-        return users.firstOrNull {it.providerId == providerId && it.providerUserId == providerUserId}
+        return users.filter {it.providerId == providerId && it.providerUserId == providerUserId}
     }
 
     fun save(user: User) {
@@ -54,5 +54,15 @@ class UserRepository {
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
+    }
+
+    fun findUserIdsConnectedTo(providerId: String, providerUserIds: MutableSet<String>): MutableSet<String> {
+        println("REPOSITORY: findUserIdsConnectedTo $providerId, $providerUserIds")
+        return users.filter { it.providerId == providerId && it.providerUserId in providerUserIds }.map { it.userId }.toMutableSet()
+    }
+
+    fun findUserIdsWithConnection(connection: Connection<*>): MutableList<String> {
+        println("REPOSITORY: findUserIdsWithConnection $connection")
+        return findByProviderIdAndProviderUserId(connection.key.providerId, connection.key.providerUserId).map { it.userId }.toMutableList()
     }
 }
