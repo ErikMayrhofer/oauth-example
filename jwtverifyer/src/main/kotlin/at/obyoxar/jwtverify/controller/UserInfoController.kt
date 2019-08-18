@@ -1,7 +1,10 @@
 package at.obyoxar.jwtverify.controller
 
+import at.obyoxar.jwtverify.configuration.User
+import at.obyoxar.jwtverify.configuration.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
@@ -18,6 +21,9 @@ class UserInfoController {
     @Autowired
     lateinit var google: Google
 
+    @Autowired
+    lateinit var repo: UserRepository
+
     @GetMapping("/user")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun getInfo(): Map<String, Any>{
@@ -26,12 +32,18 @@ class UserInfoController {
     }
 
     @GetMapping("/")
-    fun getRoot(): String{
-        return "Ruut"
+    fun getRoot(): Authentication{
+        val user = SecurityContextHolder.getContext().authentication
+        return user
     }
 
     @GetMapping("/social")
-    fun getSocialInfo(): Person {
-        return google.plusOperations().googleProfile
+    fun getSocialInfo(): String {
+        return "Yeet"
+    }
+
+    @GetMapping("/api/users")
+    fun getAllUsers(): MutableList<User> {
+        return repo.users
     }
 }

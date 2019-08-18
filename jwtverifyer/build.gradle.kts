@@ -37,6 +37,7 @@ dependencies {
     implementation("org.springframework.social:spring-social-config:1.1.6.RELEASE")
     implementation("org.springframework.social:spring-social-google:1.0.0.RELEASE")
     implementation("org.springframework.social:spring-social-github:1.0.0.M4")
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
 //    implementation("org.springframework.social:spring-social-twitter:1.1.2.RELEASE")
 //    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
 //    implementation("com.github.spring-social:spring-social-google:1.1.3")

@@ -1,8 +1,6 @@
 package at.obyoxar.jwtverify.configuration
 
 import at.obyoxar.jwtverify.lib.OJwtDecoderBase
-import at.obyoxar.jwtverify.lib.OSocialConfigurer
-import at.obyoxar.jwtverify.lib.OpenIdConnectFilter
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.PasswordLookup
@@ -21,17 +19,15 @@ import org.springframework.security.config.annotation.ObjectPostProcessor
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.oauth2.client.OAuth2RestTemplate
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory
 import org.springframework.security.web.access.channel.ChannelProcessingFilter
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.social.UserIdSource
-import org.springframework.social.connect.ConnectionRepository
-import org.springframework.social.google.api.Google
 import org.springframework.social.security.SocialAuthenticationFilter
 import org.springframework.social.security.SpringSocialConfigurer
 import java.security.Key
@@ -85,6 +81,12 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
                 .antMatchers(HttpMethod.GET, "/social").hasAuthority("USER")
                 .anyRequest().hasRole("USER")
                 .and()
+//                .formLogin().permitAll()
+//                .and()
+                .addFilter(JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(JwtAuthorizationFilter(authenticationManager()))
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .addFilterBefore(statelessAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter::class.java)
 
 
@@ -99,6 +101,27 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
 
                 .apply(socialConfigurer.userIdSource(userIdSource))
     }
+
+    @Bean
+    fun jwtDecoder(): JwtDecoder {
+        val res = javaClass.getResource("/keys/obykeys.jks")
+        val keyStore = KeyStore.getInstance("JKS")
+        keyStore.load(res.openStream(), "obypass".toCharArray())
+        val pwLookup = PasswordLookup { "obypass".toCharArray() }
+        val jwkLoadedSet = JWKSet.load(keyStore, null)
+        val jwkSet = ImmutableJWKSet<SecurityContext>(jwkLoadedSet)
+
+        val rsakey = RSAKey.load(keyStore, "obykey", "obypass".toCharArray())
+
+
+        val keyStoreFactory = KeyStoreKeyFactory(ClassPathResource("keys/obykeys.jks"), "obypass".toCharArray())
+        val keyPair = keyStoreFactory.getKeyPair("obykey")
+
+        val selector = JWSKeySelector<SecurityContext> { header, context -> mutableListOf(keyPair.public as Key) }
+        val source = JWKSource<SecurityContext> { jwkSelector, _ -> mutableListOf(rsakey as JWK) }
+        return OJwtDecoderBase(source, "RS256")
+    }
+
 
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager {
@@ -143,12 +166,5 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
 //                .withUser("admin").password(passwordEncoder.encode("nimda")).roles("ADMIN");
 //    }
 //
-//
-//    @Bean
-//    @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-//    fun google(repo: ConnectionRepository): Google{
-//        val connection = repo.findPrimaryConnection(Google::class.java)
-//        return connection.api
-//    }
 }
 

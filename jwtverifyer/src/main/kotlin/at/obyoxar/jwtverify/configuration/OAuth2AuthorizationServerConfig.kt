@@ -46,14 +46,9 @@ class OAuth2AuthorizationServerConfig: AuthorizationServerConfigurerAdapter() {
     fun tokenServices(): DefaultTokenServices {
         val defaultTokenServices = DefaultTokenServices()
         defaultTokenServices.setTokenStore(tokenStore())
-//        defaultTokenServices.setTokenEnhancer(accessTokenConverter())
+        defaultTokenServices.setTokenEnhancer(accessTokenConverter())
         defaultTokenServices.setSupportRefreshToken(true)
         return defaultTokenServices
-    }
-
-    @Bean
-    fun passwordEncoder(): BCryptPasswordEncoder {
-        return BCryptPasswordEncoder()
     }
 
     override fun configure(endpoints: AuthorizationServerEndpointsConfigurer?) {

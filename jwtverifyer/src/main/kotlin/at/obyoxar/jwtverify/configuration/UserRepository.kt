@@ -1,15 +1,31 @@
 package at.obyoxar.jwtverify.configuration
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
+import javax.annotation.PostConstruct
 
 @Component
 class UserRepository {
 
-    val users = mutableListOf(
-            User("abc1", 1, "abc", "google"),
-            User("ABC1", 2, "abc", "google"),
-            User("def1", 3, "def", "yeet")
-    )
+    @Autowired
+    lateinit var passwordEncoder: BCryptPasswordEncoder
+
+    lateinit var users: MutableList<User>
+
+    @PostConstruct
+    fun postConstruct(){
+        users = mutableListOf(
+                User(passwordEncoder.encode("abc1"), 1, "abc", "google"),
+                User(passwordEncoder.encode("123"), 2, "john", "google"),
+                User(passwordEncoder.encode("abc3"), 3, "def", "yeet"),
+                User(passwordEncoder.encode("admin"), 4, "admin", "yeet")
+        ).onEach {
+            val role = if(it.username == "admin") UserRole.ADMIN else UserRole.USER
+            it.grantRole(role)
+        }
+    }
 
     fun findByUsername(username: String): User?{
         println("REPOSITORY: findByUsername: ${username}")
@@ -27,10 +43,16 @@ class UserRepository {
     }
 
     fun save(user: User) {
+        println("REPOSITORY: save: ${user}")
         users.add(user)
     }
 
     fun count(): Long {
         return users.size.toLong()
+    }
+
+    @Bean
+    fun passwordEncoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
     }
 }

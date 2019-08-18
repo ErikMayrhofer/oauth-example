@@ -51,6 +51,8 @@ class User(password: String? = null, userId: Long? = null, username: String? = n
     }
 
     fun grantRole(user: UserRole) {
-
+        authorities.add(user.asAuthorityFor(this))
     }
+
+
 }
