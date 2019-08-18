@@ -14,6 +14,7 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
+    maven(url = "https://repo.spring.io/plugins-release/")
 }
 
 dependencies {
@@ -31,6 +32,16 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.1.7.RELEASE")
     implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
     implementation("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
+    implementation("org.springframework.social:spring-social-core:1.1.6.RELEASE")
+    implementation("org.springframework.social:spring-social-security:1.1.6.RELEASE")
+    implementation("org.springframework.social:spring-social-config:1.1.6.RELEASE")
+    implementation("org.springframework.social:spring-social-google:1.0.0.RELEASE")
+    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
+//    implementation("org.springframework.social:spring-social-twitter:1.1.2.RELEASE")
+//    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
+//    implementation("com.github.spring-social:spring-social-google:1.1.3")
+//    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
+    implementation("com.auth0:jwks-rsa:0.8.3")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator:2.1.6.RELEASE")
 

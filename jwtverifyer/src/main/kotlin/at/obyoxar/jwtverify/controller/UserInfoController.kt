@@ -5,6 +5,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.social.google.api.Google
+import org.springframework.social.google.api.plus.Person
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class UserInfoController {
+
+    @Autowired
+    lateinit var google: Google
 
     @GetMapping("/user")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -23,5 +28,10 @@ class UserInfoController {
     @GetMapping("/")
     fun getRoot(): String{
         return "Ruut"
+    }
+
+    @GetMapping("/social")
+    fun getSocialInfo(): Person {
+        return google.plusOperations().googleProfile
     }
 }
