@@ -21,10 +21,13 @@ import org.springframework.security.config.annotation.ObjectPostProcessor
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.oauth2.client.OAuth2RestTemplate
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory
+import org.springframework.security.web.access.channel.ChannelProcessingFilter
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.social.UserIdSource
 import org.springframework.social.connect.ConnectionRepository
@@ -77,20 +80,24 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
                 .antMatchers("/resources/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/users/current/details").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/user").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/api/users/current/details").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/user").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/social").hasAuthority("USER")
                 .anyRequest().hasRole("USER")
                 .and()
                 .addFilterBefore(statelessAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter::class.java)
+
+
+                .addFilterAfter({req, resp, chain ->
+                    val auth = SecurityContextHolder.getContext().authentication
+                    chain.doFilter(req, resp)
+                }, FilterSecurityInterceptor::class.java)
+                .addFilterBefore({req, resp, chain ->
+                    val auth = SecurityContextHolder.getContext().authentication
+                    chain.doFilter(req, resp)
+                }, ChannelProcessingFilter::class.java)
+
                 .apply(socialConfigurer.userIdSource(userIdSource))
-
-//                .anyRequest().permitAll()
-//                .and().formLogin().permitAll()
-//                .and().csrf().disable()
-//                .apply(OSocialConfigurer())
-//                .setSuccessHandler(authenticationSuccessHandler)
-//                .and()
-
     }
 
     @Bean
