@@ -38,14 +38,12 @@ dependencies {
     implementation("org.springframework.social:spring-social-google:1.0.0.RELEASE")
     implementation("org.springframework.social:spring-social-github:1.0.0.M4")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
-//    implementation("org.springframework.social:spring-social-twitter:1.1.2.RELEASE")
-//    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
-//    implementation("com.github.spring-social:spring-social-google:1.1.3")
-//    implementation("org.springframework.social:spring-social-github:1.0.0.M4")
+
     implementation("com.auth0:jwks-rsa:0.8.3")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator:2.1.6.RELEASE")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux:2.1.7.RELEASE")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     implementation("javax.xml.bind:jaxb-api:2.3.1")

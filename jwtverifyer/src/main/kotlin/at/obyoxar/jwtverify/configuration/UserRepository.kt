@@ -20,7 +20,8 @@ class UserRepository {
         users = mutableListOf(
                 User(passwordEncoder.encode("123"), 2, "john", "local"),
                 User(passwordEncoder.encode("admin"), 4, "admin", "local"),
-                User(passwordEncoder.encode("erik"), 5, "erik", "google", "114861104432965613969")
+//                User(passwordEncoder.encode("erik"), 5, "erik", "google", "114861104432965613969"),
+                User(passwordEncoder.encode("test"), 6, "test", "google", "114861104432965613969")
         ).onEach {
             val role = if(it.username == "admin") UserRole.ADMIN else UserRole.USER
             it.grantRole(role)
