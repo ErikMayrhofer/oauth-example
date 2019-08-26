@@ -37,7 +37,6 @@ class JwtverifyApplicationTests {
                 .expectStatus().isOk
                 .expectHeader()
                 .valueMatches("Authorization", "^Bearer ([a-zA-Z0-9]+\\.){2}[a-zA-Z0-9_-]+\$")
-        yeet
     }
 
     @Test
