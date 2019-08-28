@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.ObjectPostProcessor
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -35,6 +36,7 @@ import java.security.KeyStore
 
 @Configuration
 @Order(2)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
 
     @Autowired
@@ -79,10 +81,8 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
                 .antMatchers(HttpMethod.GET, "/api/users/current/details").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/user").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/social").hasAuthority("USER")
-                .anyRequest().hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/auth/info/me").hasAuthority("USER")
                 .and()
-//                .formLogin().permitAll()
-//                .and()
                 .addFilter(JwtAuthenticationFilter(authenticationManager()))
                 .addFilter(JwtAuthorizationFilter(authenticationManager(), userService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -90,14 +90,14 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
                 .addFilterBefore(statelessAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter::class.java)
 
 
-                .addFilterAfter({req, resp, chain ->
-                    val auth = SecurityContextHolder.getContext().authentication
-                    chain.doFilter(req, resp)
-                }, FilterSecurityInterceptor::class.java)
-                .addFilterBefore({req, resp, chain ->
-                    val auth = SecurityContextHolder.getContext().authentication
-                    chain.doFilter(req, resp)
-                }, ChannelProcessingFilter::class.java)
+//                .addFilterAfter({req, resp, chain ->
+//                    val auth = SecurityContextHolder.getContext().authentication
+//                    chain.doFilter(req, resp)
+//                }, FilterSecurityInterceptor::class.java)
+//                .addFilterBefore({req, resp, chain ->
+//                    val auth = SecurityContextHolder.getContext().authentication
+//                    chain.doFilter(req, resp)
+//                }, ChannelProcessingFilter::class.java)
 
                 .apply(socialConfigurer.userIdSource(userIdSource))
     }
@@ -135,36 +135,5 @@ class StatelessAuthenticationSecurityConfig: WebSecurityConfigurerAdapter() {
     override fun userDetailsService(): SocialUserService {
         return userService
     }
-
-
-//    @Bean
-//    fun jwtDecoder(): JwtDecoder {
-//        val res = javaClass.getResource("/keys/obykeys.jks")
-//        val keyStore = KeyStore.getInstance("JKS")
-//        keyStore.load(res.openStream(), "obypass".toCharArray())
-//        val pwLookup = PasswordLookup { "obypass".toCharArray() }
-//        val jwkLoadedSet = JWKSet.load(keyStore, null)
-//        val jwkSet = ImmutableJWKSet<SecurityContext>(jwkLoadedSet)
-//
-//        val rsakey = RSAKey.load(keyStore, "obykey", "obypass".toCharArray())
-//
-//
-//        val keyStoreFactory = KeyStoreKeyFactory(ClassPathResource("keys/obykeys.jks"), "obypass".toCharArray())
-//        val keyPair = keyStoreFactory.getKeyPair("obykey")
-//
-//        val selector = JWSKeySelector<SecurityContext> { header, context -> mutableListOf(keyPair.public as Key) }
-//        val source = JWKSource<SecurityContext> { jwkSelector, _ -> mutableListOf(rsakey as JWK) }
-//        return OJwtDecoderBase(source, "RS256")
-//    }
-//
-//    override fun configure(auth: AuthenticationManagerBuilder?) {
-//        auth!!
-//                .inMemoryAuthentication()
-//                .withUser("john").password(passwordEncoder.encode("123")).roles("USER").and()
-//                .withUser("tom").password(passwordEncoder.encode("111")).roles("ADMIN").and()
-//                .withUser("user1").password(passwordEncoder.encode("pass")).roles("USER").and()
-//                .withUser("admin").password(passwordEncoder.encode("nimda")).roles("ADMIN");
-//    }
-//
 }
 

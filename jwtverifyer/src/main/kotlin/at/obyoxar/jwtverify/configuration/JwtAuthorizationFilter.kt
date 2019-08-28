@@ -18,17 +18,22 @@ class JwtAuthorizationFilter(authenticationManager: AuthenticationManager, var u
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val authentication = getAuthentication(request)
-        if(authentication == null){
-           chain.doFilter(request, response)
+        if(authentication != null){
+            SecurityContextHolder.getContext().authentication = authentication
         }
-
-        SecurityContextHolder.getContext().authentication = authentication
         chain.doFilter(request, response)
+
+//        if(authentication == null){
+//           chain.doFilter(request, response)
+//        }
+//
+//        SecurityContextHolder.getContext().authentication = authentication
+//        chain.doFilter(request, response)
     }
 
     private fun getAuthentication(request: HttpServletRequest): Authentication? {
-//        val tokenA = request.getHeader("Authorization ")
-        val token = request.cookies.firstOrNull { it.name == "AUTH-TOKEN" }?.value
+        val token = request.getHeader("Authorization")
+//        val token = request.cookies?.firstOrNull { it.name == "AUTH-TOKEN" }?.value
         if(token == null){
             println("JwtAuthorization: Request didn't have a token")
             return null

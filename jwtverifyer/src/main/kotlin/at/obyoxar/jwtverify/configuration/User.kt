@@ -1,11 +1,16 @@
 package at.obyoxar.jwtverify.configuration
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.social.security.SocialUserDetails
 
 var globalUserId: Long = 0
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
 class User(password: String? = null, userId: Long? = null, username: String? = null,
            var providerId: String = "",
            var providerUserId: String = ""
@@ -17,6 +22,7 @@ class User(password: String? = null, userId: Long? = null, username: String? = n
 
     var accessToken: String = ""
     var expires: Long = 0
+
     val authorities = mutableListOf<UserAuthority>()
 
     var thingy = 0
@@ -34,6 +40,7 @@ class User(password: String? = null, userId: Long? = null, username: String? = n
     override fun getUserId(): String = _userId.toString()
     fun getUserIdLong(): Long = _userId
 
+    @JsonIgnore
     override fun getPassword(): String = _password
 
     override fun isAccountNonExpired(): Boolean = true

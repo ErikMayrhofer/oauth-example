@@ -1,5 +1,6 @@
 package at.obyoxar.jwtverify
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,9 +45,47 @@ class JwtverifyApplicationTests {
         webClient.get()
                 .uri("/auth/local?username=john&password=1234")
                 .exchange().also { println(it.returnResult<String>().responseHeaders) }
-                .expectStatus().isForbidden
+                .expectStatus().isUnauthorized
                 .expectHeader()
                 .doesNotExist("Authorization")
+    }
+
+    fun login(): String? {
+        val result = webClient.get()
+                .uri("/auth/local?username=john&password=123")
+                .exchange().also { println(it.returnResult<String>().responseHeaders) }
+                .expectStatus().isOk
+                .expectHeader()
+                .valueMatches("Authorization", "^Bearer ([a-zA-Z0-9]+\\.){2}[a-zA-Z0-9_-]+\$")
+                .returnResult<String>()
+        return result.responseHeaders["Authorization"]?.get(0)
+    }
+
+    @Test
+    fun getProtectedResource_localLoginThenRequest() {
+        val authHeader = login()
+        assertThat(authHeader).isNotNull()
+
+        webClient.get()
+                .uri("/auth/info/me")
+                .header("Authorization", authHeader)
+                .exchange()
+                .expectStatus().isOk
+//                .expectBody(User::class.java)
+    }
+
+    @Test
+    fun getProtectedResource_localLoginThenRequestWithWrongToken() {
+        val authHeader = login()
+        assertThat(authHeader).isNotNull()
+        authHeader!!
+
+        webClient.get()
+                .uri("/auth/info/me")
+                .header("Authorization", authHeader.replace("a", "B"))
+                .exchange()
+                .expectStatus().isForbidden
+//                .expectBody(User::class.java)
     }
 
 }
